@@ -3,7 +3,7 @@
         "taskID": 1,
         "taskDescription": "123",
         "taskCreatedAt": "2026-02-12 14:45:18",
-        "taskStatus": "todo"
+        "taskStatus": "done"
     },
     {
         "taskID": 2,

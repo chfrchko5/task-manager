@@ -1,10 +1,13 @@
 import datetime
 import typer
-from typing import Annotated
+from typing import Annotated, Optional
+from typing_extensions import Literal
 import os
 import json
+import json_stream
 
-app = typer.Typer()
+
+app = typer.Typer(help="Task Manager")
 json_file = "tasks.json"
 
 class Task:
@@ -48,6 +51,37 @@ class Task:
         with open(json_file, "w") as f:
             json.dump(data, f, indent=4)
 
+    def list_tasks(self, status: str):
+        # opens the json file
+        # with the exceptions that it doesnt exist or is empty/unreadable
+        try:
+            with open(json_file, 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            print(f"File {json_file} does not exist")
+        except json.JSONDecodeError:
+            print(f"Unable to read '{json_file}'")
+
+
+        # lists based on the status provided
+        # at the time of writing i was so cooked
+        # need to fix or make it more pythonic type shit
+        if status == "all":
+            formatted = data
+        elif status == "todo":
+            for todo in data:
+                if todo['taskStatus'] == "todo":
+                    formatted = todo
+        elif status == "in_progress":
+            for in_progress in data:
+                if in_progress['taskStatus'] == "in_progress":
+                    formatted = in_progress
+        elif status == "done":
+            for done in data:
+                if done['taskStatus'] == "done":
+                    formatted = done
+
+        print(json.dumps(formatted, indent=4))
 
 # option 'add' which needs a task description
 # writes the new task to the json file
@@ -58,9 +92,9 @@ def add(task: Annotated[str, typer.Argument(help="Description of a task to save"
 
 
 @app.command()
-def list():
-    print("using list option")
-
+def list(status: Literal["all", "done", "in_progress", "todo"] = typer.Argument("all")):
+    list_all = Task(status)
+    list_all.list_tasks(status)
 
 if __name__ == "__main__":
     app()
