@@ -9,6 +9,7 @@ import json
 app = typer.Typer(help="Task Manager")
 json_file = "tasks.json"
 
+# func for file printing in 'list_tasks' to make less repetitive
 def print_tasks(status):
     print(json.dumps(status, indent=4))
 
@@ -124,6 +125,28 @@ class Task:
         with open(json_file, "w") as f:
             json.dump(new_data, f, indent=4)
 
+    def mark_status(self, new_status: str, id: int):
+        # opens the json file
+        # with the exceptions that it doesnt exist or is empty/unreadable
+        try:
+            with open(json_file, 'r') as f:
+                data = json.load(f)
+        except FileNotFoundError:
+            print(f"File {json_file} does not exist")
+        except json.JSONDecodeError:
+            print(f"Unable to read '{json_file}'")
+
+        # select the corresponding task to the id provided
+        # replace the task status with a new provided status
+        for task in data:
+            if task['taskID'] == id:
+                task['taskStatus'] = new_status
+                break
+
+        with open(json_file, "w") as f:
+            json.dump(data, f, indent=4)
+
+
 # option 'add' which needs a task description
 # writes the new task to the json file
 @app.command()
@@ -135,7 +158,7 @@ def add(task: Annotated[str, typer.Argument(help="Description of a task to save"
 # option 'list' tasks, which by default prints out 'all' tasks
 # then with an option out of the remaining 3 statuses print the prompted one
 @app.command()
-def list(status: Literal["all", "done", "in_progress", "todo"] = typer.Argument("all")):
+def list(status: Literal["all", "done", "in_progress", "todo"] = typer.Argument("all", help="list tasks by 'done', 'in_progress' or 'todo'")):
     list_all = Task()
     list_all.list_tasks(status)
 
@@ -146,6 +169,14 @@ def update(task_id: Annotated[int, typer.Argument(help="id of a task to update")
            new_task: Annotated[str, typer.Argument(help="description of a new task")]):
     update_task = Task()
     update_task.update_task(task_id, new_task)
+
+# option 'mark_status' to change the status of an existing task
+# TRY ADDING HELP FOR THE NEW_STATUS TING
+@app.command()
+def mark_status(new_status: Literal["in_progress", "done"],
+                task_id: Annotated[int, typer.Argument(help="id of a task to change status of")]):
+    mark_status = Task()
+    mark_status.mark_status(new_status, task_id)
 
 # option 'delete' that takes an id of a task and removes it from the tasks file
 @app.command()
