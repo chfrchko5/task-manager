@@ -59,6 +59,7 @@ class Task:
 
         # append new data into the file
         data.append(task_data)
+        print(f"task added (ID:{next_id})")
 
         # write and save the file
         with open(json_file, "w") as f:
@@ -108,18 +109,19 @@ class Task:
         # select the corresponding task to the id provided
         # replace the task with a new task
         if data:
-            for task in data:
-                if task['taskID'] == id:
-                    task['taskDescription'] = new_task
-                    task['taskUpdatedAt'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-                    break
-                elif task['taskID'] != id:
-                    print('Task you provided does not exist')
-                    break
-            with open(json_file, "w") as f:
-                json.dump(data, f, indent=4)
+            exists = any(d.get('taskID') == id for d in data)
+            if not exists:
+                print(f"task provided does not exist (ID:{id})")
+            else:
+                for task in data:
+                    if task['taskID'] == id:
+                        task['taskDescription'] = new_task
+                        task['taskUpdatedAt'] = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                        print(f"updated the task (ID:{id})")
+                with open(json_file, "w") as f:
+                    json.dump(data, f, indent=4)
         else:
-            print('Task you provided does not exist')
+            print('Task file error')
 
     def delete_task(self, id: int):
         # opens the json file
@@ -128,10 +130,16 @@ class Task:
 
         # re-creates the json file without the id that was specified
         # then rewrites the file again and saves it while removing the requested dictionary
-        new_data = [d for d in data if d.get('taskID') != id]
+        if data:
+            exists = any(d.get('taskID') == id for d in data)
+            if not exists:
+                print(f"task provided does not exist (ID:{id})")
+            else:
+                new_data = [d for d in data if d.get('taskID') != id]
+                print(f"task deleted (ID:{id})")
         
-        with open(json_file, "w") as f:
-            json.dump(new_data, f, indent=4)
+                with open(json_file, "w") as f:
+                    json.dump(new_data, f, indent=4)
 
     def mark_status(self, new_status: str, id: int):
         # opens the json file
@@ -141,18 +149,19 @@ class Task:
         # select the corresponding task to the id provided
         # replace the task status with a new provided status
         if data:
-            for task in data:
-                if task['taskID'] == id:
-                    task['taskStatus'] = new_status
-                    break
-                elif task['taskID'] != id:
-                    print('Task you provided does not exist')
-                    break
-
-            with open(json_file, "w") as f:
-                json.dump(data, f, indent=4)          
+            exists = any(d.get('taskID') == id for d in data)
+            if not exists:
+                print(f"task provided does not exist (ID:{id})")
+            else:
+                for task in data:
+                    if task['taskID'] == id:
+                        task['taskStatus'] = new_status
+                        break
+                print(f"task status updated (ID:{id})")
+                with open(json_file, "w") as f:
+                    json.dump(data, f, indent=4)          
         else:
-            print('Task you provided does not exist')
+            print('Task file error')
 
 
 # option 'add' which needs a task description
