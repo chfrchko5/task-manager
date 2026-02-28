@@ -2,9 +2,14 @@
 
 task manager app built using python
 
+# Description
+simple app to track tasks  
+can add, list, delete tasks
+
+
 ## Installation
 
-pull the repo and use the "todo-cli.py" located in 'src/todo/' directory
+pull the repo, install requirements.txt and use the "todo-cli.py" located in 'src/todo/' directory
 
 ## Usage
 
