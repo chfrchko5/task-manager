@@ -17,3 +17,6 @@ pull the repo, install requirements.txt and use the "todo-cli.py" located in 'sr
 # list help options to start using the application
 todo-cli.py --help
 ```
+
+# Based on
+https://roadmap.sh/projects/task-tracker
